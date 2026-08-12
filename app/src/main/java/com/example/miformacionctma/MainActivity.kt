@@ -23,6 +23,7 @@ import com.example.miformacionctma.domain.ActividadFormativa
 import com.example.miformacionctma.domain.Prioridad
 import com.example.miformacionctma.domain.actividadesUrgentes
 import com.example.miformacionctma.domain.promedioProgreso
+import com.example.miformacionctma.ui.screens.PantallaActividades
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,13 +31,13 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             MiFormacionCTMATheme {
-                Scaffold(
-                    modifier = Modifier.fillMaxSize()
-                ) { innerPadding ->
-                    PantallaInicio(
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+
+                PantallaActividades(
+                    actividades = actividadesEjemplo,
+                    onActividadClick = { actividad ->
+                        println("Actividad seleccionada: ${actividad.titulo}")
+                    }
+                )
             }
         }
     }
