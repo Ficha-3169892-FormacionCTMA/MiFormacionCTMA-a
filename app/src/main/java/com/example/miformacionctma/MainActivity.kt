@@ -19,7 +19,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.miformacionctma.ui.theme.MiFormacionCTMATheme
-
+import com.example.miformacionctma.domain.ActividadFormativa
+import com.example.miformacionctma.domain.Prioridad
+import com.example.miformacionctma.domain.actividadesUrgentes
+import com.example.miformacionctma.domain.promedioProgreso
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,9 +44,39 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun PantallaInicio(
-    nombre: String = "Aprendiz",
     modifier: Modifier = Modifier
 ) {
+
+    val actividades = listOf(
+        ActividadFormativa(
+            id = 1,
+            titulo = "Aprender Kotlin",
+            descripcion = "Variables y funciones",
+            progreso = 80,
+            diasRestantes = 2,
+            prioridad = Prioridad.ALTA
+        ),
+        ActividadFormativa(
+            id = 2,
+            titulo = "Jetpack Compose",
+            descripcion = "Crear interfaces",
+            progreso = 100,
+            diasRestantes = -2,
+            prioridad = Prioridad.MEDIA
+        ),
+        ActividadFormativa(
+            id = 3,
+            titulo = "Git y GitHub",
+            descripcion = "Control de versiones",
+            progreso = 40,
+            diasRestantes = 1,
+            prioridad = Prioridad.ALTA
+        )
+    )
+
+    val promedio = promedioProgreso(actividades)
+    val urgentes = actividadesUrgentes(actividades)
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -54,25 +87,34 @@ fun PantallaInicio(
 
         Text(
             text = "Mi Formación CTMA",
-            style = MaterialTheme.typography.headlineMedium,
-            color = MaterialTheme.colorScheme.primary
+            style = MaterialTheme.typography.headlineMedium
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
         Text(
-            text = "Hola, $nombre",
-            style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.secondary
+            text = "Promedio de progreso: ${"%.2f".format(promedio)}%"
         )
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 
         Text(
-            text = "Aquí organizarás actividades y evidencias.",
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            text = "Actividades urgentes: ${urgentes.size}"
         )
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Text(
+            text = "Listado de actividades:"
+        )
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        actividades.forEach { actividad ->
+            Text(
+                text = "${actividad.titulo} - ${actividad.progreso}%"
+            )
+        }
     }
 }
 
