@@ -23,6 +23,7 @@ import com.example.miformacionctma.domain.ActividadFormativa
 import com.example.miformacionctma.domain.Prioridad
 import com.example.miformacionctma.domain.actividadesUrgentes
 import com.example.miformacionctma.domain.promedioProgreso
+import com.example.miformacionctma.ui.screens.PantallaActividades
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,7 +60,7 @@ fun PantallaInicio(
         ActividadFormativa(
             id = 2,
             titulo = "Jetpack Compose",
-            descripcion = "Crear interfaces",
+            descripcion = "Crear interfaces declarativas",
             progreso = 100,
             diasRestantes = -2,
             prioridad = Prioridad.MEDIA
@@ -71,51 +72,69 @@ fun PantallaInicio(
             progreso = 40,
             diasRestantes = 1,
             prioridad = Prioridad.ALTA
+        ),
+        ActividadFormativa(
+            id = 4,
+            titulo = "Diseño de interfaces",
+            descripcion = "Crear una interfaz clara y accesible",
+            progreso = 0,
+            diasRestantes = 5,
+            prioridad = Prioridad.MEDIA
+        ),
+        ActividadFormativa(
+            id = 5,
+            titulo = "Material 3",
+            descripcion = "Aplicar componentes de Material Design",
+            progreso = 30,
+            diasRestantes = 4,
+            prioridad = Prioridad.MEDIA
+        ),
+        ActividadFormativa(
+            id = 6,
+            titulo = "Accesibilidad",
+            descripcion = "Revisar contraste y tamaño de texto",
+            progreso = 60,
+            diasRestantes = 2,
+            prioridad = Prioridad.ALTA
+        ),
+        ActividadFormativa(
+            id = 7,
+            titulo = "LazyColumn",
+            descripcion = "Construir listas eficientes en Compose",
+            progreso = 20,
+            diasRestantes = 3,
+            prioridad = Prioridad.MEDIA
+        ),
+        ActividadFormativa(
+            id = 8,
+            titulo = "Preview de Compose",
+            descripcion = "Probar diferentes configuraciones",
+            progreso = 50,
+            diasRestantes = 6,
+            prioridad = Prioridad.BAJA
+        ),
+        ActividadFormativa(
+            id = 9,
+            titulo = "Prueba en dispositivo",
+            descripcion = "Ejecutar la aplicación en el teléfono",
+            progreso = 0,
+            diasRestantes = 1,
+            prioridad = Prioridad.ALTA
+        ),
+        ActividadFormativa(
+            id = 10,
+            titulo = "Documentación",
+            descripcion = "Registrar decisiones y resultados",
+            progreso = 100,
+            diasRestantes = 0,
+            prioridad = Prioridad.BAJA
         )
     )
 
-    val promedio = promedioProgreso(actividades)
-    val urgentes = actividadesUrgentes(actividades)
-
-    Column(
+    PantallaActividades(
+        actividades = actividades,
         modifier = modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-
-        Text(
-            text = "Mi Formación CTMA",
-            style = MaterialTheme.typography.headlineMedium
-        )
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        Text(
-            text = "Promedio de progreso: ${"%.2f".format(promedio)}%"
-        )
-
-        Spacer(modifier = Modifier.height(10.dp))
-
-        Text(
-            text = "Actividades urgentes: ${urgentes.size}"
-        )
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        Text(
-            text = "Listado de actividades:"
-        )
-
-        Spacer(modifier = Modifier.height(10.dp))
-
-        actividades.forEach { actividad ->
-            Text(
-                text = "${actividad.titulo} - ${actividad.progreso}%"
-            )
-        }
-    }
+    )
 }
 
 @Preview(showBackground = true)
