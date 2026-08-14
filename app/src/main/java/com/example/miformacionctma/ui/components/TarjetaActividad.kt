@@ -12,20 +12,19 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import com.example.miformacionctma.domain.ActividadFormativa
-import com.example.miformacionctma.domain.estadoActividad
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.unit.dp
+import com.example.miformacionctma.domain.ActividadFormativa
+import com.example.miformacionctma.domain.estadoActividad
 
 @Composable
 fun TarjetaActividad(
     actividad: ActividadFormativa,
     onClick: () -> Unit
 ) {
-
     val estado = estadoActividad(actividad)
 
     Card(
@@ -39,27 +38,26 @@ fun TarjetaActividad(
                 onClick()
             }
     ) {
-
         Column(
             modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-
             Text(
                 text = actividad.titulo,
                 style = MaterialTheme.typography.titleMedium
             )
 
-            Text(
-                text = actividad.descripcion ?: "Sin descripción",
-                style = MaterialTheme.typography.bodyMedium
-            )
+            actividad.descripcion?.let { descripcion ->
+                Text(
+                    text = descripcion,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-
                 Text(
                     text = "Estado: $estado",
                     style = MaterialTheme.typography.labelLarge
@@ -72,7 +70,11 @@ fun TarjetaActividad(
             }
 
             Text(
-                text = "Días restantes: ${actividad.diasRestantes}"
+                text = if (actividad.diasRestantes >= 0) {
+                    "Días restantes: ${actividad.diasRestantes}"
+                } else {
+                    "Actividad vencida"
+                }
             )
 
             Text(
@@ -81,19 +83,19 @@ fun TarjetaActividad(
 
             LinearProgressIndicator(
                 progress = {
-                    actividad.progreso / 100f
+                    actividad.progreso.coerceIn(0, 100) / 100f
                 },
                 modifier = Modifier.fillMaxWidth()
             )
         }
     }
 }
+
 @androidx.compose.ui.tooling.preview.Preview(
     showBackground = true
 )
 @Composable
 private fun TarjetaActividadPreview() {
-
     TarjetaActividad(
         actividad = ActividadFormativa(
             id = 999L,
