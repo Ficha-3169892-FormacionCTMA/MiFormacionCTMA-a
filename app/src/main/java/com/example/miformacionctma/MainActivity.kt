@@ -5,127 +5,100 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.miformacionctma.domain.ActividadFormativa
 import com.example.miformacionctma.domain.Prioridad
 import com.example.miformacionctma.ui.screens.PantallaActividades
+import com.example.miformacionctma.ui.screens.PantallaDetalleActividad
+import com.example.miformacionctma.ui.screens.PantallaFormularioActividad
 import com.example.miformacionctma.ui.theme.MiFormacionCTMATheme
 
 class MainActivity : ComponentActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-
         setContent {
             MiFormacionCTMATheme {
-                PantallaInicio()
+                AppNavigation()
             }
         }
     }
 }
 
 @Composable
-fun PantallaInicio(
-    modifier: Modifier = Modifier
-) {
+fun AppNavigation() {
+    val navController = rememberNavController()
+    
+    // Estados temporales en memoria
+    val actividades = remember { mutableStateListOf<ActividadFormativa>() }
+    var busqueda by remember { mutableStateOf("") }
+    var prioridadFiltro by remember { mutableStateOf<Prioridad?>(null) }
 
-    val actividades = listOf(
-        ActividadFormativa(
-            id = 1,
-            titulo = "Aprender Kotlin",
-            descripcion = "Variables y funciones",
-            progreso = 80,
-            diasRestantes = 2,
-            prioridad = Prioridad.ALTA
-        ),
-        ActividadFormativa(
-            id = 2,
-            titulo = "Jetpack Compose",
-            descripcion = "Crear interfaces declarativas",
-            progreso = 100,
-            diasRestantes = -2,
-            prioridad = Prioridad.MEDIA
-        ),
-        ActividadFormativa(
-            id = 3,
-            titulo = "Git y GitHub",
-            descripcion = "Control de versiones",
-            progreso = 40,
-            diasRestantes = 1,
-            prioridad = Prioridad.ALTA
-        ),
-        ActividadFormativa(
-            id = 4,
-            titulo = "Diseño de interfaces",
-            descripcion = "Crear una interfaz clara y accesible",
-            progreso = 0,
-            diasRestantes = 5,
-            prioridad = Prioridad.MEDIA
-        ),
-        ActividadFormativa(
-            id = 5,
-            titulo = "Material 3",
-            descripcion = "Aplicar componentes de Material Design",
-            progreso = 30,
-            diasRestantes = 4,
-            prioridad = Prioridad.MEDIA
-        ),
-        ActividadFormativa(
-            id = 6,
-            titulo = "Accesibilidad",
-            descripcion = "Revisar contraste y tamaño de texto",
-            progreso = 60,
-            diasRestantes = 2,
-            prioridad = Prioridad.ALTA
-        ),
-        ActividadFormativa(
-            id = 7,
-            titulo = "LazyColumn",
-            descripcion = "Construir listas eficientes en Compose",
-            progreso = 20,
-            diasRestantes = 3,
-            prioridad = Prioridad.MEDIA
-        ),
-        ActividadFormativa(
-            id = 8,
-            titulo = "Preview de Compose",
-            descripcion = "Probar diferentes configuraciones",
-            progreso = 50,
-            diasRestantes = 6,
-            prioridad = Prioridad.BAJA
-        ),
-        ActividadFormativa(
-            id = 9,
-            titulo = "Prueba en dispositivo",
-            descripcion = "Ejecutar la aplicación en el teléfono",
-            progreso = 0,
-            diasRestantes = 1,
-            prioridad = Prioridad.ALTA
-        ),
-        ActividadFormativa(
-            id = 10,
-            titulo = "Documentación",
-            descripcion = "Registrar decisiones y resultados",
-            progreso = 100,
-            diasRestantes = 0,
-            prioridad = Prioridad.BAJA
-        )
-    )
+    // Lógica de filtrado en memoria
+    val listaFiltrada = actividades.filter { 
+        it.titulo.contains(busqueda, ignoreCase = true) && 
+        (prioridadFiltro == null || it.prioridad == prioridadFiltro)
+    }
 
-    PantallaActividades(
-        actividades = actividades,
-        onActividadClick = { actividad ->
-            println("Actividad seleccionada: ${actividad.titulo}")
+    NavHost(
+        navController = navController,
+        startDestination = "lista"
+    ) {
+        composable("lista") {
+            PantallaActividades(
+                actividades = listaFiltrada,
+                busqueda = busqueda,
+                prioridadSeleccionada = prioridadFiltro,
+                onBusquedaChange = { busqueda = it },
+                onPrioridadChange = { prioridadFiltro = it },
+                onActividadClick = { actividad ->
+                    navController.navigate("detalle/${actividad.id}")
+                },
+                onAgregarClick = {
+                    navController.navigate("formulario")
+                },
+                onCompletarActividad = { actividad ->
+                    val index = actividades.indexOfFirst { it.id == actividad.id }
+                    if (index != -1) actividades[index] = actividades[index].copy(progreso = 100)
+                },
+                onBorrarActividad = { actividad ->
+                    actividades.removeIf { it.id == actividad.id }
+                }
+            )
         }
-    )
-}
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    MiFormacionCTMATheme {
-        PantallaInicio()
+        composable("formulario") {
+            PantallaFormularioActividad(
+                onBack = { navController.popBackStack() },
+                onGuardar = { nuevaActividad ->
+                    actividades.add(nuevaActividad)
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(
+            route = "detalle/{actividadId}",
+            arguments = listOf(navArgument("actividadId") { type = NavType.LongType })
+        ) { backStackEntry ->
+            val id = backStackEntry.arguments?.getLong("actividadId")
+            val actividad = actividades.find { it.id == id }
+
+            if (actividad != null) {
+                PantallaDetalleActividad(
+                    actividad = actividad,
+                    onBack = { navController.popBackStack() }
+                )
+            }
+        }
     }
 }
