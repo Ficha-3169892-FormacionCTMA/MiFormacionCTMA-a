@@ -91,6 +91,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
+
 fun PantallaInicio(
     modifier: Modifier = Modifier
 ) {
