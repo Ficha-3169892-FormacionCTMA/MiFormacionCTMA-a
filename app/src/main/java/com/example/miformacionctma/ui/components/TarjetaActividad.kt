@@ -100,6 +100,7 @@ private fun TarjetaActividadPreview() {
             titulo = "Esta es una actividad con un título bastante largo para comprobar que no se recorta",
             descripcion = "Actividad utilizada para probar el diseño de la tarjeta.",
             progreso = 100,
+            fecha = "2026-08-19",
             diasRestantes = 0,
             prioridad = com.example.miformacionctma.domain.Prioridad.ALTA
         ),

@@ -24,6 +24,16 @@ import com.example.miformacionctma.domain.Prioridad
 import com.example.miformacionctma.domain.actividadesUrgentes
 import com.example.miformacionctma.domain.promedioProgreso
 import com.example.miformacionctma.ui.screens.PantallaActividades
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.example.miformacionctma.ui.screens.PantallaCrearActividad
+import com.example.miformacionctma.ui.screens.PantallaDetalleActividad
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,13 +41,50 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             MiFormacionCTMATheme {
+                val navController = rememberNavController()
+                val actividades = remember { mutableStateListOf(*actividadesEjemplo.toTypedArray()) }
 
-                PantallaActividades(
-                    actividades = actividadesEjemplo,
-                    onActividadClick = { actividad ->
-                        println("Actividad seleccionada: ${actividad.titulo}")
+                NavHost(navController = navController, startDestination = "lista") {
+                    composable("lista") {
+                        PantallaActividades(
+                            actividades = actividades,
+                            onActividadClick = { id ->
+                                navController.navigate("detalle/$id")
+                            },
+                            onAddClick = {
+                                navController.navigate("crear")
+                            }
+                        )
                     }
-                )
+
+                    composable("crear") {
+                        PantallaCrearActividad(
+                            onActividadGuardada = { nuevaActividad ->
+                                if (!actividades.any { it.id == nuevaActividad.id }) {
+                                    actividades.add(nuevaActividad)
+                                }
+                                navController.popBackStack("lista", inclusive = false)
+                            },
+                            onBackClick = {
+                                navController.popBackStack()
+                            }
+                        )
+                    }
+
+                    composable(
+                        route = "detalle/{actividadId}",
+                        arguments = listOf(navArgument("actividadId") { type = NavType.LongType })
+                    ) { backStackEntry ->
+                        val id = backStackEntry.arguments?.getLong("actividadId") ?: 0L
+                        PantallaDetalleActividad(
+                            actividadId = id,
+                            actividades = actividades,
+                            onBackClick = {
+                                navController.popBackStack()
+                            }
+                        )
+                    }
+                }
             }
         }
     }
@@ -54,6 +101,7 @@ fun PantallaInicio(
             titulo = "Aprender Kotlin",
             descripcion = "Variables y funciones",
             progreso = 80,
+            fecha = "2026-08-21",
             diasRestantes = 2,
             prioridad = Prioridad.ALTA
         ),
@@ -62,6 +110,7 @@ fun PantallaInicio(
             titulo = "Jetpack Compose",
             descripcion = "Crear interfaces",
             progreso = 100,
+            fecha = "2026-08-17",
             diasRestantes = -2,
             prioridad = Prioridad.MEDIA
         ),
@@ -70,6 +119,7 @@ fun PantallaInicio(
             titulo = "Git y GitHub",
             descripcion = "Control de versiones",
             progreso = 40,
+            fecha = "2026-08-20",
             diasRestantes = 1,
             prioridad = Prioridad.ALTA
         )

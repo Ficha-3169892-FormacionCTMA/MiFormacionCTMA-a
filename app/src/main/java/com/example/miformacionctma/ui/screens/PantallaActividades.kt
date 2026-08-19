@@ -14,6 +14,10 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -29,7 +33,8 @@ import com.example.miformacionctma.ui.components.TarjetaActividad
 @Composable
 fun PantallaActividades(
     actividades: List<ActividadFormativa>,
-    onActividadClick: (ActividadFormativa) -> Unit
+    onActividadClick: (Long) -> Unit,
+    onAddClick: () -> Unit
 ) {
 
     Scaffold(
@@ -39,16 +44,23 @@ fun PantallaActividades(
                     Text("Mi Formación CTMA")
                 }
             )
+        },
+        floatingActionButton = {
+            FloatingActionButton(onClick = onAddClick) {
+                Icon(Icons.Default.Add, contentDescription = "Agregar actividad")
+            }
         }
     ) { paddingValues ->
 
         if (actividades.isEmpty()) {
 
             EstadoVacio(
-                paddingValues = paddingValues
+                paddingValues = paddingValues,
+                onAddClick = onAddClick
             )
 
         } else {
+// ... (rest of the BoxWithConstraints logic)
 
             BoxWithConstraints(
                 modifier = Modifier
@@ -87,7 +99,7 @@ fun PantallaActividades(
                             TarjetaActividad(
                                 actividad = actividad,
                                 onClick = {
-                                    onActividadClick(actividad)
+                                    onActividadClick(actividad.id)
                                 }
                             )
                         }
@@ -135,7 +147,7 @@ fun PantallaActividades(
                             TarjetaActividad(
                                 actividad = actividad,
                                 onClick = {
-                                    onActividadClick(actividad)
+                                    onActividadClick(actividad.id)
                                 }
                             )
                         }
@@ -148,7 +160,8 @@ fun PantallaActividades(
 
 @Composable
 private fun EstadoVacio(
-    paddingValues: PaddingValues
+    paddingValues: PaddingValues,
+    onAddClick: () -> Unit
 ) {
 
     Box(
@@ -171,9 +184,7 @@ private fun EstadoVacio(
             )
 
             Button(
-                onClick = {
-                    // Acción futura
-                }
+                onClick = onAddClick
             ) {
                 Text("Agregar actividad")
             }

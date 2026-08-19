@@ -25,7 +25,7 @@ fun PantallaDetalleActividad(
                 title = { Text("Detalle de Actividad") },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Atrás")
+                        Icon(Icons.Filled.ArrowBack, contentDescription = "Atrás")
                     }
                 }
             )
