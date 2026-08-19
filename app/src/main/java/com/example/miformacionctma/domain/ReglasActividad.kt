@@ -1,12 +1,42 @@
 package com.example.miformacionctma.domain
 
 
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
+
 fun validarActividad(actividad: ActividadFormativa): List<String> {
 
     val errores = mutableListOf<String>()
 
     if (actividad.titulo.isBlank()) {
         errores.add("El título es obligatorio.")
+    } else if (actividad.titulo.length < 3) {
+        errores.add("El título debe tener al menos 3 caracteres.")
+    } else if (actividad.titulo.length > 80) {
+        errores.add("El título no debe superar los 80 caracteres.")
+    }
+
+    if (actividad.descripcion != null && actividad.descripcion.length > 240) {
+        errores.add("La descripción no debe superar los 240 caracteres.")
+    }
+
+    val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+    sdf.isLenient = false
+    try {
+        val fechaIngresada = sdf.parse(actividad.fecha)
+        val hoy = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }.time
+
+        if (fechaIngresada != null && fechaIngresada.before(hoy)) {
+            errores.add("La fecha no puede ser anterior a hoy.")
+        }
+    } catch (e: Exception) {
+        errores.add("El formato de fecha debe ser YYYY-MM-DD.")
     }
 
     if (actividad.progreso !in 0..100) {
