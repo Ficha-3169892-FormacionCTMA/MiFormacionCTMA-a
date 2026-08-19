@@ -18,12 +18,12 @@ import com.example.miformacionctma.domain.estadoActividad
 @Composable
 fun TarjetaActividad(
     actividad: ActividadFormativa,
-    onActividadClick: (ActividadFormativa) -> Unit = {}
+    onActividadClick: (Long) -> Unit = {}
 ) {
     val estado = estadoActividad(actividad)
 
     Card(
-        onClick = { onActividadClick(actividad) },
+        onClick = { onActividadClick(actividad.id) },
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 6.dp)

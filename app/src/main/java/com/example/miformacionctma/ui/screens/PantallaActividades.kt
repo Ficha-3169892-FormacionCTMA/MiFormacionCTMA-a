@@ -16,14 +16,34 @@ import androidx.compose.ui.unit.dp
 import com.example.miformacionctma.domain.ActividadFormativa
 import com.example.miformacionctma.ui.components.TarjetaActividad
 
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.TopAppBar
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PantallaActividades(
     actividades: List<ActividadFormativa>,
-    modifier: Modifier = Modifier,
-    onActividadClick: (ActividadFormativa) -> Unit = {}
+    onActividadClick: (Long) -> Unit,
+    onAddClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Scaffold(
-        modifier = modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize(),
+        topBar = {
+            TopAppBar(
+                title = { Text("Mis Actividades") }
+            )
+        },
+        floatingActionButton = {
+            FloatingActionButton(onClick = onAddClick) {
+                Icon(Icons.Default.Add, contentDescription = "Agregar Actividad")
+            }
+        }
     ) { innerPadding ->
 
         if (actividades.isEmpty()) {
@@ -45,8 +65,8 @@ fun PantallaActividades(
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(innerPadding)
-                    .padding(horizontal = 16.dp),
+                    .padding(innerPadding),
+                contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
 

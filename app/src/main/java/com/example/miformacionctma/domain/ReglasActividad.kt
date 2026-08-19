@@ -1,19 +1,56 @@
 package com.example.miformacionctma.domain
 
 
-fun validarActividad(actividad: ActividadFormativa): List<String> {
-
-    val errores = mutableListOf<String>()
-
-    if (actividad.titulo.isBlank()) {
-        errores.add("El título es obligatorio.")
+fun validarTitulo(titulo: String): String? {
+    return when {
+        titulo.isBlank() -> "El título es obligatorio."
+        titulo.length < 3 -> "El título debe tener al menos 3 caracteres."
+        titulo.length > 80 -> "El título no puede exceder los 80 caracteres."
+        else -> null
     }
+}
 
-    if (actividad.progreso !in 0..100) {
-        errores.add("El progreso debe estar entre 0 y 100.")
+fun validarDescripcion(descripcion: String): String? {
+    return if (descripcion.length > 240) {
+        "La descripción no puede exceder los 240 caracteres."
+    } else null
+}
+
+fun validarProgreso(progreso: String): String? {
+    val valor = progreso.toIntOrNull()
+    return if (valor == null || valor !in 0..100) {
+        "El progreso debe ser un número entre 0 y 100."
+    } else null
+}
+
+fun validarFecha(fecha: String): String? {
+    // Validación simple de formato AAAA-MM-DD y que no sea anterior a hoy
+    return try {
+        val partes = fecha.split("-")
+        if (partes.size != 3) return "Formato inválido (AAAA-MM-DD)."
+        
+        val anio = partes[0].toInt()
+        val mes = partes[1].toInt()
+        val dia = partes[2].toInt()
+        
+        val fechaIngresada = java.util.Calendar.getInstance().apply {
+            set(anio, mes - 1, dia, 0, 0, 0)
+            set(java.util.Calendar.MILLISECOND, 0)
+        }
+        
+        val hoy = java.util.Calendar.getInstance().apply {
+            set(java.util.Calendar.HOUR_OF_DAY, 0)
+            set(java.util.Calendar.MINUTE, 0)
+            set(java.util.Calendar.SECOND, 0)
+            set(java.util.Calendar.MILLISECOND, 0)
+        }
+        
+        if (fechaIngresada.before(hoy)) {
+            "La fecha no puede ser anterior a hoy."
+        } else null
+    } catch (e: Exception) {
+        "Fecha inválida."
     }
-
-    return errores
 }
 
 fun estadoActividad(actividad: ActividadFormativa): String {
